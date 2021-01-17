@@ -1,0 +1,12 @@
+{
+    "name": "sojebsikder/chat_application",
+    "authors": [
+        {
+            "name": "sojebsikder",
+            "email": "sojebsikder@gmail.com"
+        }
+    ],
+    "require": {
+        "phpmailer/phpmailer": "^6.2"
+    }
+}
