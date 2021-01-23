@@ -56,8 +56,8 @@ if(isset($_POST["register"]))
 
             $mail->SMTPAuth = true;
 
-            $mail->Username   = 'sojebsikder7@gmail.com';                     // SMTP username
-            $mail->Password   = 'sojebsikder123';
+            $mail->Username   = 'xxxxx';                     // SMTP username
+            $mail->Password   = 'xxxxxx';
 
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
 
@@ -172,8 +172,7 @@ if(isset($_POST["register"]))
 
                             <div class="form-group">
                                 <label>Enter Your Password</label>
-                                <!-- data-parsley-pattern="^[a-zA-Z]+$" -->
-                                <input type="password" name="user_password" id="user_password" class="form-control" data-parsley-minlength="6" data-parsley-maxlength="12" required />
+                                <input type="password" name="user_password" id="user_password" class="form-control" data-parsley-minlength="6" data-parsley-maxlength="12" data-parsley-pattern="^[a-zA-Z]+$" required />
                             </div>
 
                             <div class="form-group text-center">

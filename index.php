@@ -3,6 +3,60 @@
 
 session_start();
 
+$error = '';
+
+if(isset($_SESSION['user_data']))
+{
+    header('location:chatroom.php');
+}
+
+if(isset($_POST['login']))
+{
+    require_once('database/ChatUser.php');
+
+    $user_object = new ChatUser;
+
+    $user_object->setUserEmail($_POST['user_email']);
+
+    $user_data = $user_object->get_user_data_by_email();
+
+    if(is_array($user_data) && count($user_data) > 0)
+    {
+        if($user_data['user_status'] == 'Enable')
+        {
+            if($user_data['user_password'] == $_POST['user_password'])
+            {
+                $user_object->setUserId($user_data['user_id']);
+                $user_object->setUserLoginStatus('Login');
+
+                if($user_object->update_user_login_data())
+                {
+                    $_SESSION['user_data'][$user_data['user_id']] = [
+                        'id'    =>  $user_data['user_id'],
+                        'name'  =>  $user_data['user_name'],
+                        'profile'   =>  $user_data['user_profile']
+                    ];
+
+                    header('location:chatroom.php');
+
+                }
+            }
+            else
+            {
+                $error = 'Wrong Password';
+            }
+        }
+        else
+        {
+            $error = 'Please Verify Your Email Address';
+        }
+    }
+    else
+    {
+        $error = 'Wrong Email Address';
+    }
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -39,7 +93,7 @@ session_start();
     <div class="containter">
         <br />
         <br />
-        <h1 class="text-center">PHP Chat Application using Websocket</h1>
+        <h1 class="text-center">Chat Application in PHP & MySql using WebSocket - Login</h1>
         <div class="row justify-content-md-center mt-5">
             
             <div class="col-md-4">
@@ -53,7 +107,34 @@ session_start();
                     ';
                     unset($_SESSION['success_message']);
                }
+
+               if($error != '')
+               {
+                    echo '
+                    <div class="alert alert-danger">
+                    '.$error.'
+                    </div>
+                    ';
+               }
                ?>
+                <div class="card">
+                    <div class="card-header">Login</div>
+                    <div class="card-body">
+                        <form method="post" id="login_form">
+                            <div class="form-group">
+                                <label>Enter Your Email Address</label>
+                                <input type="text" name="user_email" id="user_email"  class="form-control" data-parsley-type="email" required />
+                            </div>
+                            <div class="form-group">
+                                <label>Enter Your Password</label>
+                                <input type="password" name="user_password" id="user_password" class="form-control" required />
+                            </div>
+                            <div class="form-group text-center">
+                                <input type="submit" name="login" id="login" class="btn btn-primary" value="Login" />
+                            </div>
+                        </form>
+                    </div>  
+                </div>
             </div>
         </div>
     </div>
@@ -66,7 +147,7 @@ session_start();
 
 $(document).ready(function(){
     
-    
+    $('#login_form').parsley();
     
 });
 
