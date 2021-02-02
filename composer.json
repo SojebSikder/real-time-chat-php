@@ -6,7 +6,13 @@
             "email": "sojebsikder@gmail.com"
         }
     ],
+    "autoload": {
+        "psr-4": {
+            "MyApp\\": "src"
+        }
+    },
     "require": {
-        "phpmailer/phpmailer": "^6.2"
+        "phpmailer/phpmailer": "^6.2",
+        "cboden/ratchet": "^0.4.3"
     }
 }

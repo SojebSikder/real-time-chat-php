@@ -64,12 +64,27 @@ session_start();
 <body>
 	<div class="container">
 		<br />
-        <h3 class="text-center">PHP Chat Application using Websocket</h3>
+        <h3 class="text-center">PHP Chat Application using Websocket - Save Chat Message in Mysql</h3>
         <br />
 		<div class="row">
 			
 			<div class="col-lg-8">
-				
+				<div class="card">
+					<div class="card-header"><h3>Chat Room</h3></div>
+					<div class="card-body" id="messages_area">
+
+					</div>
+				</div>
+
+				<form method="post" id="chat_form" data-parsley-errors-container="#validation_error">
+					<div class="input-group mb-3">
+						<textarea class="form-control" id="chat_message" name="chat_message" placeholder="Type Message Here" data-parsley-maxlength="1000" data-parsley-pattern="/^[a-zA-Z0-9\s]+$/" required></textarea>
+						<div class="input-group-append">
+							<button type="submit" name="send" id="send" class="btn btn-primary"><i class="fa fa-paper-plane"></i></button>
+						</div>
+					</div>
+					<div id="validation_error"></div>
+				</form>
 			</div>
 			<div class="col-lg-4">
 				<?php
@@ -97,6 +112,62 @@ session_start();
 <script type="text/javascript">
 	
 	$(document).ready(function(){
+
+		var conn = new WebSocket('ws://localhost:8080');
+		conn.onopen = function(e) {
+		    console.log("Connection established!");
+		};
+
+		conn.onmessage = function(e) {
+		    console.log(e.data);
+
+		    var data = JSON.parse(e.data);
+
+		    var row_class = '';
+
+		    var background_class = '';
+
+		    if(data.from == 'Me')
+		    {
+		    	row_class = 'row justify-content-start';
+		    	background_class = 'text-dark alert-light';
+		    }
+		    else
+		    {
+		    	row_class = 'row justify-content-end';
+		    	background_class = 'alert-success';
+		    }
+
+		    var html_data = "<div class='"+row_class+"'><div class='col-sm-10'><div class='shadow-sm alert "+background_class+"'><b>"+data.from+" - </b>"+data.msg+"<br /><div class='text-right'><small><i>"+data.dt+"</i></small></div></div></div></div>";
+
+		    $('#messages_area').append(html_data);
+
+		    $("#chat_message").val("");
+		};
+
+		$('#chat_form').parsley();
+
+		$('#chat_form').on('submit', function(event){
+
+			event.preventDefault();
+
+			if($('#chat_form').parsley().isValid())
+			{
+
+				var user_id = $('#login_user_id').val();
+
+				var message = $('#chat_message').val();
+
+				var data = {
+					userId : user_id,
+					msg : message
+				};
+
+				conn.send(JSON.stringify(data));
+
+			}
+
+		});
 		
 		$('#logout').click(function(){
 
@@ -112,6 +183,7 @@ session_start();
 
 					if(response.status == 1)
 					{
+						conn.close();
 						location = 'index.php';
 					}
 				}
